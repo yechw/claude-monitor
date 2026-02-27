@@ -25,6 +25,21 @@ const MAX_MESSAGES_PER_SESSION = 100;
 /** Maximum errors to keep per session */
 const MAX_ERRORS_PER_SESSION = 50;
 
+/** Event types for state changes */
+export type StateEventType =
+  | 'session.started'
+  | 'session.ended'
+  | 'session.updated';
+
+/** State event payload */
+export interface StateEvent {
+  type: StateEventType;
+  payload: unknown;
+}
+
+/** Observer function type */
+export type StateObserver = (event: StateEvent) => void;
+
 /**
  * StateManager handles all session tracking and state versioning
  */
@@ -44,6 +59,32 @@ export class StateManager {
   /** ID of the currently active/focused session */
   private activeSessionId?: string;
 
+  /** Observers for state changes */
+  private observers: StateObserver[] = [];
+
+  /**
+   * Subscribe to state changes
+   */
+  subscribe(observer: StateObserver): () => void {
+    this.observers.push(observer);
+    return () => {
+      const index = this.observers.indexOf(observer);
+      if (index !== -1) {
+        this.observers.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Emit an event to all observers
+   */
+  private emit(type: StateEventType, payload: unknown): void {
+    const event: StateEvent = { type, payload };
+    for (const observer of this.observers) {
+      observer(event);
+    }
+  }
+
   /**
    * Increment the version counter
    */
@@ -59,6 +100,7 @@ export class StateManager {
     this.messages.set(session.ref.sessionId, []);
     this.errors.set(session.ref.sessionId, []);
     this.bumpVersion();
+    this.emit('session.started', session);
   }
 
   /**
@@ -83,6 +125,7 @@ export class StateManager {
     if (session) {
       Object.assign(session, updates);
       this.bumpVersion();
+      this.emit('session.updated', session);
     }
   }
 
@@ -97,6 +140,7 @@ export class StateManager {
       this.activeSessionId = undefined;
     }
     this.bumpVersion();
+    this.emit('session.ended', { sessionId });
   }
 
   /**
