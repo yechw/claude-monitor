@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * CLI Entry Point
  *
@@ -49,6 +50,9 @@ export function parseArgs(argv: string[]): CliOptions {
   if (firstArg && !firstArg.startsWith('-')) {
     if (VALID_COMMANDS.includes(firstArg as typeof VALID_COMMANDS[number])) {
       options.command = firstArg as CliOptions['command'];
+    } else {
+      // Invalid command - log warning and fall back to default
+      console.warn(`Warning: Unknown command '${firstArg}'. Falling back to default.`);
     }
   }
 
