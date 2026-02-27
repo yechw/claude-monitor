@@ -9,6 +9,7 @@
  */
 
 import { Type, Static } from '@sinclair/typebox';
+import { Value } from '@sinclair/typebox/value';
 import { StateVersionSchema } from './types.js';
 
 // ============================================================
@@ -190,28 +191,18 @@ export function createEventFrame(
 // Parsing
 // ============================================================
 
-/** Valid frame type values */
-type FrameType = 'req' | 'res' | 'event';
-
-/** Check if a value is a valid frame type */
-function isValidFrameType(type: unknown): type is FrameType {
-  return type === 'req' || type === 'res' || type === 'event';
-}
-
 /**
  * Parse a JSON string into a Frame object
- * @throws Error if the JSON is invalid or not a valid frame
+ * @throws SyntaxError if the JSON is invalid
+ * @throws Error if the parsed data does not conform to FrameSchema
  */
 export function parseFrame(json: string): Frame {
   const parsed = JSON.parse(json);
-  // Basic validation - ensure it has a type field
-  if (!parsed || typeof parsed.type !== 'string') {
-    throw new Error('Invalid frame: missing type field');
+  // Validate against the FrameSchema using TypeBox
+  if (!Value.Check(FrameSchema, parsed)) {
+    throw new Error('Invalid frame: schema validation failed');
   }
-  if (!isValidFrameType(parsed.type)) {
-    throw new Error(`Invalid frame type: ${parsed.type}`);
-  }
-  return parsed as Frame;
+  return parsed;
 }
 
 // ============================================================

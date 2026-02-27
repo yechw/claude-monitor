@@ -45,3 +45,49 @@ describe('Protocol Frames', () => {
     expect(parsed.error?.code).toBe('NOT_FOUND');
   });
 });
+
+describe('parseFrame error cases', () => {
+  it('should throw SyntaxError for invalid JSON', () => {
+    expect(() => parseFrame('not valid json')).toThrow(SyntaxError);
+  });
+
+  it('should throw Error for missing type field', () => {
+    const invalidFrame = JSON.stringify({ id: 'test' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for invalid frame type', () => {
+    const invalidFrame = JSON.stringify({ type: 'invalid', id: 'test' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for empty string id in request frame', () => {
+    const invalidFrame = JSON.stringify({ type: 'req', id: '', method: 'test' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for empty string id in response frame', () => {
+    const invalidFrame = JSON.stringify({ type: 'res', id: '', ok: true });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for empty string event name in event frame', () => {
+    const invalidFrame = JSON.stringify({ type: 'event', event: '' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for missing required fields in request frame', () => {
+    const invalidFrame = JSON.stringify({ type: 'req', id: 'test' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for missing required fields in response frame', () => {
+    const invalidFrame = JSON.stringify({ type: 'res', id: 'test' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+
+  it('should throw Error for wrong type for ok field in response frame', () => {
+    const invalidFrame = JSON.stringify({ type: 'res', id: 'test', ok: 'yes' });
+    expect(() => parseFrame(invalidFrame)).toThrow('Invalid frame: schema validation failed');
+  });
+});
