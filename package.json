@@ -3,11 +3,15 @@
   "version": "0.0.1",
   "description": "Monitor tool for Claude Code CLI instances",
   "type": "module",
+  "bin": {
+    "claude-monitor": "./dist/cli.js"
+  },
   "scripts": {
-    "dev": "echo 'dev script placeholder'",
-    "build": "echo 'build script placeholder'",
-    "test": "echo 'test script placeholder'",
-    "typecheck": "echo 'typecheck script placeholder'"
+    "dev": "tsdown watch",
+    "build": "tsdown",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "claude",
@@ -18,5 +22,17 @@
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "ws": "^8.18.0",
+    "@sinclair/typebox": "^0.34.30"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "tsdown": "^0.12.3",
+    "vitest": "^3.0.5",
+    "@types/node": "^22.13.4",
+    "@types/ws": "^8.5.14"
   }
 }
