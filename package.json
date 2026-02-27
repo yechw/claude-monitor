@@ -1,0 +1,22 @@
+{
+  "name": "claude-monitor",
+  "version": "0.0.1",
+  "description": "Monitor tool for Claude Code CLI instances",
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'dev script placeholder'",
+    "build": "echo 'build script placeholder'",
+    "test": "echo 'test script placeholder'",
+    "typecheck": "echo 'typecheck script placeholder'"
+  },
+  "keywords": [
+    "claude",
+    "monitor",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
